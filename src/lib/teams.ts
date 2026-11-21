@@ -53,7 +53,7 @@ export function useLiveData() {
     queryKey: ["board"],
     retry: false,
     refetchInterval: 4000,
-    queryFn: () => withCode((code) => fns.getBoard({ data: { code } })),
+    queryFn: () => fns.getBoard({ data: { code: "abierto" } }),
   });
   return {
     teams: (board.data?.teams ?? []) as unknown as Team[],

@@ -46,7 +46,60 @@ const DEFAULT_STATE: ServerHackathonState = {
 let memoryState: ServerHackathonState = DEFAULT_STATE;
 const STATE_FILE = "/tmp/pixelhack-hackathon-state.json";
 
-async function readDiskState(): Promise<ServerHackathonState> {
+function hasSupabaseAdminEnv(): boolean {
+  return Boolean(process.env["SUPABASE_URL"] && process.env["SUPABASE_SERVICE_ROLE_KEY"]);
+}
+
+async function readSupabaseState(): Promise<ServerHackathonState | null> {
+  if (!hasSupabaseAdminEnv()) return null;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await (supabaseAdmin as any)
+      .from("hackathon_state")
+      .select("timer, reviews, podium_published, updated_at")
+      .eq("id", "main")
+      .maybeSingle();
+    if (error || !data) return null;
+    const parsed = stateSchema.safeParse({
+      timer: data.timer,
+      reviews: data.reviews ?? {},
+      podiumPublished: Boolean(data.podium_published),
+      updatedAt: Number(data.updated_at ?? 0),
+    });
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeSupabaseState(next: ServerHackathonState): Promise<boolean> {
+  if (!hasSupabaseAdminEnv()) return false;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as any)
+      .from("hackathon_state")
+      .upsert(
+        {
+          id: "main",
+          timer: next.timer,
+          reviews: next.reviews,
+          podium_published: next.podiumPublished,
+          updated_at: next.updatedAt,
+        },
+        { onConflict: "id" },
+      );
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+async function readState(): Promise<ServerHackathonState> {
+  const remote = await readSupabaseState();
+  if (remote) {
+    memoryState = remote;
+    return remote;
+  }
   try {
     const fs = await import("node:fs/promises");
     const raw = await fs.readFile(STATE_FILE, "utf8");
@@ -60,8 +113,9 @@ async function readDiskState(): Promise<ServerHackathonState> {
   return memoryState;
 }
 
-async function writeDiskState(next: ServerHackathonState): Promise<void> {
+async function writeState(next: ServerHackathonState): Promise<void> {
   memoryState = next;
+  await writeSupabaseState(next);
   try {
     const fs = await import("node:fs/promises");
     await fs.writeFile(STATE_FILE, JSON.stringify(next), "utf8");
@@ -78,15 +132,15 @@ export const verifyAdminLogin = createServerFn({ method: "POST" })
   });
 
 export const getHackathonState = createServerFn({ method: "GET" }).handler(async () => {
-  return readDiskState();
+  return readState();
 });
 
 export const saveHackathonState = createServerFn({ method: "POST" })
   .inputValidator(stateSchema)
   .handler(async ({ data }) => {
-    const current = await readDiskState();
+    const current = await readState();
     if (data.updatedAt >= current.updatedAt) {
-      await writeDiskState(data);
+      await writeState(data);
       return data;
     }
     return current;
