@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useSyncExternalStore } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { ShieldCheck, Volume2, VolumeX } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { HackathonTimerBar } from "@/components/HackathonTimerBar";
 import { initMuted, isMuted, setMuted, sfx, subscribeMuted } from "@/lib/sound";
 
 const NAV = [
@@ -10,6 +11,7 @@ const NAV = [
   { to: "/equipos", label: "Equipos", color: "bg-cyan" },
   { to: "/bienestar", label: "Bienestar", color: "bg-pink" },
   { to: "/recursos", label: "Recursos", color: "bg-sun" },
+  { to: "/podio", label: "🏆 Podio", color: "bg-sun" },
 ] as const;
 
 export function SiteHeader() {
@@ -36,6 +38,17 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
+          <Link
+            to="/admin"
+            onClick={() => sfx.click()}
+            onMouseEnter={() => sfx.hover()}
+            aria-label="Panel de Admin"
+            title="Panel de Admin"
+            className="grid size-10 place-items-center rounded-full bg-card text-ink pop-sm press"
+            activeProps={{ className: "bg-pink !text-ink" }}
+          >
+            <ShieldCheck className="size-5" />
+          </Link>
           <button
             onClick={() => {
               setMuted(!muted);
@@ -48,6 +61,7 @@ export function SiteHeader() {
           </button>
         </nav>
       </div>
+      <HackathonTimerBar />
     </header>
   );
 }

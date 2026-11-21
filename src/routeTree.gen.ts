@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BienestarRouteImport } from './routes/bienestar'
+import { Route as PodioRouteImport } from './routes/podio'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as RetosRouteImport } from './routes/retos'
 import { Route as EquiposIndexRouteImport } from './routes/equipos.index'
@@ -21,9 +23,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BienestarRoute = BienestarRouteImport.update({
   id: '/bienestar',
   path: '/bienestar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PodioRoute = PodioRouteImport.update({
+  id: '/podio',
+  path: '/podio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecursosRoute = RecursosRouteImport.update({
@@ -49,7 +61,9 @@ const EquiposTeamIdRoute = EquiposTeamIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bienestar': typeof BienestarRoute
+  '/podio': typeof PodioRoute
   '/recursos': typeof RecursosRoute
   '/retos': typeof RetosRoute
   '/equipos/$teamId': typeof EquiposTeamIdRoute
@@ -57,7 +71,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bienestar': typeof BienestarRoute
+  '/podio': typeof PodioRoute
   '/recursos': typeof RecursosRoute
   '/retos': typeof RetosRoute
   '/equipos/$teamId': typeof EquiposTeamIdRoute
@@ -66,7 +82,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bienestar': typeof BienestarRoute
+  '/podio': typeof PodioRoute
   '/recursos': typeof RecursosRoute
   '/retos': typeof RetosRoute
   '/equipos/$teamId': typeof EquiposTeamIdRoute
@@ -76,7 +94,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/bienestar'
+    | '/podio'
     | '/recursos'
     | '/retos'
     | '/equipos/$teamId'
@@ -84,7 +104,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/bienestar'
+    | '/podio'
     | '/recursos'
     | '/retos'
     | '/equipos/$teamId'
@@ -92,7 +114,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/bienestar'
+    | '/podio'
     | '/recursos'
     | '/retos'
     | '/equipos/$teamId'
@@ -101,7 +125,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   BienestarRoute: typeof BienestarRoute
+  PodioRoute: typeof PodioRoute
   RecursosRoute: typeof RecursosRoute
   RetosRoute: typeof RetosRoute
   EquiposTeamIdRoute: typeof EquiposTeamIdRoute
@@ -117,11 +143,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bienestar': {
       id: '/bienestar'
       path: '/bienestar'
       fullPath: '/bienestar'
       preLoaderRoute: typeof BienestarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/podio': {
+      id: '/podio'
+      path: '/podio'
+      fullPath: '/podio'
+      preLoaderRoute: typeof PodioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recursos': {
@@ -157,7 +197,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   BienestarRoute: BienestarRoute,
+  PodioRoute: PodioRoute,
   RecursosRoute: RecursosRoute,
   RetosRoute: RetosRoute,
   EquiposTeamIdRoute: EquiposTeamIdRoute,
