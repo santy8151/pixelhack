@@ -1,0 +1,1 @@
+GRANT ALL ON public.teams, public.evidences, public.approvals TO service_role;
